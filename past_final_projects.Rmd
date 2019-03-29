@@ -1,0 +1,55 @@
+---
+output: html_document
+---
+
+# Past Final Projects
+
+### [Extensive Data Gathering / Cleaning] 
+### __Katherine Binney: Analyzing MA public school quality.__
+
+#### Pros:
+
+Binney provided a lot of data, enabling one to look at different grade levels and different levels of expectations. For many of her plots, she identified and provided contextual information on outliers, which was very useful (as seen, for instance, with her plot about English Language Learners and test scores).
+
+Her R code demonstrated extensive data gathering and cleaning - she joined dataframes in order to link data about a school's MCAS scores to demographic information (creating ultimately a dataframe that had to be separated into smaller dataframes in order to be processed by the Shiny App!) She was also able to calculate key information about schools (such as the total number of students) from data about the number and percentage of high need kids at a school. 
+
+Her leaflet map is effective in providing a visual take on the data, and includes appropriately informative labels with the school name and its specific percent of students passing the MCAS. The only suggestion I would make would be to change the color scheme because the white dots were difficult to see against the white map background.
+
+#### Cons:
+
+Binney's Shiny App opens to an uninteresting page full of text. 
+Her histogram attempting to show the different distributions of schools based on their percent of students meeting the threshold was confusing - shaded bars or a faceted approach would have been more clear. 
+
+The Shiny interface was also somewhat confusing in that you could select multiple grade levels at the same time, but only one would be shown. Being able to see across different grade levels at the same time might have been useful. 
+
+Color as well as formatted titles for the faceted plots would have been useful. Logarithmic scales may have helped resolve some clustering of data points near the axises in plots like those attempting to link race and test scores. 
+
+#### Takeaways
+
+Binney's project demonstrates manipulating, cleaning, and joining multiple, large, complex datasets. Many of her plots appeared to lack clear messages / trends, but this could be an unfortunate result of her data, rather than the plots she chose. In some cases, logarithmic scales may have helped prevent clustering of the datapoints. 
+
+### __Kemi Akenzua: Death Row Last Words__
+
+#### Pros:
+
+Kemi has picked a timely topic - inmates facing the death penalty - and has provided clear justification for why her data is compelling. She focuses on Texas, which conducts the most executions among all the states. Her graphics all make use of color and appropriate labels to enhance the message being shown. 
+
+She effectively allows for comparison of death penalty executions over time by including data from a thirty year span. In this instance, the use of a stacked histogram clearly demonstrates that Texas alone makes up a large share of all Death Penalty executions in the US.
+
+I really like her inclusion of a random inmates last words -- this makes the data feel more accessible and tangible to viewers of her app. This table is also well formatted to not look like raw data. 
+
+#### Cons:
+
+Kemi's Shiny App also opens on a relatively uninteresting "About" page with an overabundance of text. 
+
+While her inclusion of an option to display a summary table is nice, the formatting of that summary table is still much closer to a raw data format, with columns not in an easily informative order, and with multiple rows for each inmate because individual rows are given for each word. 
+
+She provides the option of a best-fit line for changes in sentiment over time among Texas Death Row subjects - reporting an r value would be useful in qualifying this model to see if the trend is actually significant. It would also be useful if she reported n - the total number of Texas Death Row inmates. 
+
+To make her word cloud more effective, I would include what source she used to tag certain words as associated with "joy" or "anticipation"
+
+More histograms or bar charts using data from the sentiment analysis would have added to the information conveyed - I found myself wondering whether the percentage of individuals who used a certain word differered across racial groups (something not so clear from her scatterplot)
+
+#### Takeaways
+
+Kemi's final project demonstrated creativity and purpose. She was very creative in her presentation of the data, and her plots and overall Shiny App were well designed. She provided thorough and insightful comments throughout her code. More basic plots could have added to the insights derived from this data.  

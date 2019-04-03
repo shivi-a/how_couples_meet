@@ -1,0 +1,203 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readstata13)
+library(ggplot2)
+library(fs)
+library(stringr)
+library(gt)
+library(lubridate)
+library(forcats)
+library(ggthemes)
+
+```
+
+```{r data, echo=FALSE, warning=FALSE}
+
+couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta")
+
+```
+
+```{r pay, echo=FALSE, warning=FALSE}
+
+# As part of the survey, respondents are asked whether or not they earn the same amount or more than their partner. I wanted to explore the breakdown of these respondents according to the sex of the respondents, to see if it reflected my inuition that women are still making less than their male partners
+
+couples %>% 
+  
+  mutate(Q23 = fct_relevel(Q23, 
+                           "We earned about the same amount",
+                           "[Partner Name] earned more", 
+                           "I earned more")) %>% 
+  
+  mutate(Q23 = fct_recode(Q23,"We earned about the same" = "We earned about the same amount", "My partner earned more" = "[Partner Name] earned more")) %>% 
+  
+  # Removed those who refused from the dataset as well as those who reported that their partner was not working for pay -- a small total that do not contribute to any major trends
+  
+  filter(!is.na(Q23), 
+         Q23 != "Refused", 
+         Q23 != "[Partner Name] was not working for pay") %>%  
+  
+  # Create bar chart based on responses for Q23 (respondent's pay versus partner's pay)
+  
+  ggplot(aes(x = Q23, fill = ppgender)) + 
+  
+  geom_bar(show.legend=FALSE) + 
+  
+  facet_wrap(~ppgender) + 
+  
+  coord_flip() + 
+  
+  theme_few() + 
+  
+  scale_fill_manual(values = c("dodgerblue4", "deeppink4")) +
+  
+  labs(
+    title = "Earnings among Partners in the US", 
+    subtitle = "Women were more likely to report making less than their partner", 
+    caption = "Source: HCMST 2017", 
+    x = NULL, y = NULL)
+
+```
+
+```{r months, echo=FALSE}
+
+# Calculate the number of couples that should be meeting each month if meetings were independently distributed across months
+
+avg_meet_per_month <- couples %>%
+  
+  # Filter out couples not relevant to the total -- where their response to this question was NA or they refused
+  
+  filter(!is.na(Q21A_Month), 
+         Q21A_Month != "Refused") %>% 
+  
+  # Find the total and divide by 12 for the 12 months
+  
+  nrow() / 12
+
+couples %>% 
+  
+  # Remove those who refused to answer this question
+  
+  filter(Q21A_Month != "Refused") %>% 
+  
+  # Create barplot with the counts of couples who first met in each month
+  
+  ggplot(aes(x = Q21A_Month, fill = Q21A_Month)) + 
+  
+  # Hide the legend for a cleaner plot
+  
+  geom_bar(show.legend=FALSE) + 
+  
+  # Use theme_few for a cleaner plot
+  
+  theme_few() + 
+  
+   # Add a horizontal line at the value representing the number of couples in this dataset that should be marrying each month if marriages were equally distributed - allows one to better understand what is a deviation from this null hypothesis
+  
+  geom_hline(yintercept=avg_meet_per_month, linetype="dashed") + 
+  
+  # Add labels to contextualize plot - X and Y axis labels are not needed
+  
+  labs(
+    title = "'Summer Love' - When Couples First Meet", 
+    subtitle = "Couples were more likely to meet their partner in June or September", 
+    caption = "Source: HCMST 2017", x = NULL, y = NULL)
+
+
+# Calculate the number of couples that should be marrying each month if meetings were independently distributed across months
+
+avg_marry_per_month <- couples %>% 
+  
+  # Filter out couples not relevant to the total -- where their response to this question was NA or they refused
+  
+  filter(!is.na(Q21D_Month), 
+         Q21D_Month != "Refused") %>% 
+  
+  # Find the total and divide by 12 for the 12 months
+  
+  nrow() / 12
+
+couples %>% 
+  
+  # Remove those who refused to answer this question
+  
+  filter(Q21D_Month != "Refused") %>% 
+  
+  # Create bar plot with the counts of couples who married in each month
+  
+  ggplot(aes(x = Q21D_Month, fill = Q21D_Month)) + 
+  
+  # Hide the legend for a cleaner plot
+  
+  geom_bar(show.legend=FALSE) + 
+  
+  # Use theme_few from gganimate for a cleaner plot
+  
+  theme_few() + 
+  
+  # Add a horizontal line at the value representing the number of couples in this dataset that should be marrying each month if marriages were equally distributed - allows one to better understand what is a deviation from this null hypothesis
+  
+  geom_hline(yintercept=avg_marry_per_month, linetype = "dashed") +
+  
+  # Add appropriate labels to provide context to plot
+  # X and Y axis labels are not needed in this situation
+  
+  labs(
+    title = "When Couples Marry", 
+    subtitle = "Couples were more likely to marry in spring or late summer months", 
+    caption = "Source: HCMST 2017", x = NULL, y = NULL)
+
+```
+
+```{r age, echo=FALSE, warning=FALSE}
+
+# Create graphic to show the relationship between respondent's age and their partner's age -- are most reporting partners who are older than them? How does this differ according to the sex of the respondent?
+
+couples %>% 
+  
+  # Remove those who refused to answer this question (coded by a value of "-1")
+  filter(Q9 != -1) %>% 
+  
+  # Create a scatterplot of respondent's age versus partner's age, and colored by the respondent's gender
+  
+  ggplot(aes(x = ppage, y = Q9, color = ppgender)) +
+  
+  # Make points translucent to allow for visualization of overlapping points
+  
+  geom_point(alpha = 0.6) + 
+  
+  # Change the color scale to match more intuitive designations of male and female
+  
+  scale_color_manual(values = c("dodgerblue", "deeppink"), name = "Respondent's Sex") +
+  
+  # Add labels to contextualize the plot
+  
+  labs(title = "Correlations in Partner Ages", 
+    subtitle = "Women tended to report older partners, while men reported younger partners", 
+    x = "Respondent's Age", 
+    y = "Partner's Age") + 
+  
+  # Add a line with a slope of 1 -- points that lie on this line represent couples where the two are the same age -- above it, the partner is older, and below, the respondent is older
+  
+  geom_abline(slope = 1, linetype = "dashed") + 
+  
+  # Use theme_few for a cleaner plot
+  
+  theme_few() + 
+  
+  # Expand the limits of the default view so that the x and y axes are proportional, both showing 10 to 90
+  
+  expand_limits(x = 10:90) + 
+  
+  # Ensure that breaks are shown for the x and y axis in intervals of 10, as we tend to think of age in decades
+  
+  scale_x_continuous(breaks = seq(0, 100, by = 10)) + 
+  
+  scale_y_continuous(breaks = seq(0, 100, by = 10))
+
+```

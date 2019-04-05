@@ -5,6 +5,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+# Load neccessary dependencies
+
 library(tidyverse)
 library(readstata13)
 library(ggplot2)
@@ -18,6 +20,8 @@ library(ggthemes)
 ```
 
 ```{r data, echo=FALSE, warning=FALSE}
+
+# Read in data from STATA dta file
 
 couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta")
 

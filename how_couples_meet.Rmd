@@ -2,6 +2,9 @@
 output: html_document
 ---
 
+# Milestone - April 5th
+For my final project, I plan to explore the "How Couples Meet and Stay Together" dataset from the Stanford Social Science Data Collection. This survey asks a representative sample of English literate adults in the United States about their relationship status and how relationships developed. Thus far, I have downloaded the data into a dataframe, and explored the meaning of different variables by heavily consulting the codebook and creating various graphics and summary statistics. I have made a few graphics so far reflecting different dimensions of the data. I plan to tidy the data further, creating useful column labels and clean ones (using janitor) and to make further visualizations that can be subset using demographics of the couples (e.g race, gender, etc) and are animated
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 

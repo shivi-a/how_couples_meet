@@ -14,11 +14,12 @@ couples_data <- read_rds("couples_file.rds")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
-   # Application title
-   titlePanel("How Couples Meet"),
-   
+  
    # Sidebar with a slider input for number of bins 
+   br(),
+   
+   navbarPage("How Couples Meet and Stay Together",
+              tabPanel("Couple Characteristics",
    sidebarLayout(
       sidebarPanel(
          radioButtons("region",
@@ -28,6 +29,10 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          tabsetPanel(
+           tabPanel("About",
+                    br(),
+                    h6("Thanks to data from the ", a("ShotSpotter Project", href="http://justicetechlab.org/shotspotter-data/"), " by the Justice Tech Lab, we can visualize gunshot data in Camden, NJ")
+                    ),
            tabPanel("When Couples Meet", 
                     plotOutput("meetPlot")),
            tabPanel("Marry",
@@ -35,9 +40,27 @@ ui <- fluidPage(
          )
       )
    )
-)
+),
+tabPanel("Meetings",
+         mainPanel(
+           h2("Meetings")
+         )),
+tabPanel("Marriage",
+         mainPanel(
+           h2("Marriage")
+         )),
+tabPanel("About",
+         mainPanel(
+           h2("SSDS Social Science Data Collection"),
+           h5("Thanks to data from the ", a("Social Science Data Collection", href="https://data.stanford.edu/hcmst2017"), " at Stanford University, we can understand how couples meet"),
+           br(),
+           h2("Source Code"),
+           h5("The source code for this Shiny App can be found", a("HERE", href="https://github.com/shivi-a/how_couples_meet"))
+         ))
+))
 
 # Define server logic required to draw a histogram
+
 server <- function(input, output) {
   
   output$meetPlot <- renderPlot({

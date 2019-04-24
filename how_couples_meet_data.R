@@ -33,8 +33,21 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
   # Remove in final script
   
   gathered_couples %>% count(meeting_type) %>% arrange(desc(n))
+  
+  gathered_couples %>% count(meeting_type) %>% arrange(desc(n)) %>% mutate(n = n / n())
+  
+  gathered_couples %>% group_by(ppeduc) %>% count(meeting_type) %>% arrange(desc(n)) %>% View()
+  
+  gathered_couples2 <- gathered_couples %>% gather(`_R_cowork`:`_btwn_I_neighbor`, key = "connections", value = "connect_value") %>% filter(connect_value == "yes")
 
-couples_orig <- read.dta13("HCMST_ver_3.04.dta")
+  couples_orig <- read.dta13("HCMST_ver_3.04.dta")
+  
+  gathered_couples %>% filter(Q25 == "Same High School") %>% count(meeting_type) %>% arrange(desc(n))
+  # roughly half those who went to the same high school as their partner met their partner in high school
+  #Q12
+  
+  # Do attended same school but did not meet because of school
+  # Do attended same college, but did not meet because of college
 
 # Create temp file to write the R data structure to
 

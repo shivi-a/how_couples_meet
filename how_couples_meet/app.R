@@ -20,18 +20,13 @@ ui <- fluidPage(
    
    navbarPage("How Couples Meet and Stay Together",
               tabPanel("Couple Characteristics",
-   sidebarLayout(
-      sidebarPanel(
-         radioButtons("region",
-                     "Region:", unique(couples_data$ppreg9)),
-         selectInput("education",
-                     "Respondent Education Level:", unique(couples_data$ppeduc))
-      ),
-      
-      # Show a plot of the generated distribution
       mainPanel(
          tabsetPanel(
            tabPanel("Earnings",
+                    sidebarPanel(
+                      selectInput("education",
+                                  "Respondent Education Level:", unique(couples_data$ppeduc))
+                    ),
                     h3("Earnings between Partners in the US"),
                     plotOutput("incomePlot"),
                     h4("The majority of men reported making more than their partners at all education levels. Women were more likely to report making less than their partner, except those with professional or doctorate degrees"),
@@ -49,13 +44,29 @@ ui <- fluidPage(
                     plotOutput("marryPlot"))
          )
       )
-   )
-),
+   ),
 tabPanel("Meet",
          mainPanel(
-           h2("Meetings")
+           h2("Meetings"),
+           br(),
+           tabsetPanel(
+             tabPanel("Types",
+                      h3("Types of Meetings")
+             ),
+             tabPanel("Classmates",
+                      h3("Did partners who went to the same high school or college meet as classmates?")
+                      #plotOutput("schoolPlot"),
+                      #plotOutput("collegePlot"),
+                      #plotOutput("classPlot")
+                      
+             )
+           )
          )),
 tabPanel("Marry",
+         sidebarPanel(
+           radioButtons("region",
+                        "Region:", unique(couples_data$ppreg9))
+           ),
          mainPanel(
            h2("Marriage"),
            h4("When do couples marry?"),
@@ -70,8 +81,10 @@ tabPanel("Stay Together",
 tabPanel("About",
          mainPanel(
            h2("The Data"),
-           h5("Thanks to data from the ", a("Social Science Data Collection", href="https://data.stanford.edu/hcmst2017"), " at Stanford University, we can understand how couples meet"),
-           br(),
+           h5("Thanks to data from the ", a("Social Science Data Collection", href="https://data.stanford.edu/hcmst2017"), " at Stanford University, we can understand trends among couples and how they meet in the US"),
+           h5("This data was collected between July 13 and August 1, 2017, and featured 3,510 survey respondents - a representative sample of English literate adults in the US"),
+           h5("Citation"),
+           h6("Rosenfeld, Michael J., Reuben J. Thomas, and Sonia Hausen. 2019 How Couples Meet and Stay Together 2017 fresh sample. Stanford, CA: Stanford University Libraries."),
            h2("Source Code"),
            h5("The source code for this Shiny App can be found", a("HERE", href="https://github.com/shivi-a/how_couples_meet"))
          ))
@@ -145,6 +158,37 @@ server <- function(input, output) {
         labs(x = NULL, y = NULL)
     
    })
+  
+  output$schoolPlot <- renderPlot({
+    
+    gathered_couples %>% 
+      filter(Q25 == "Same High School", 
+             Q26 == "Did not attend same college or university") %>% 
+      count(meeting_type) %>% 
+      arrange(desc(n)) 
+      
+    #divide by total number to get percentages then table or plot
+  })
+  
+  output$collegePlot <- renderPlot({
+    
+    gathered_couples %>% 
+      filter(Q26 == "Attended same college or university", 
+             Q25 == "Different High School") %>% 
+      count(meeting_type) %>% 
+      arrange(desc(n))
+    
+  })
+  
+  output$classPlot <- renderPlot({
+    
+    gathered_couples %>% 
+      filter(Q26 == "Attended same college or university", 
+             Q25 == "Same High School") %>% 
+      count(meeting_type) %>% 
+      arrange(desc(n))
+    
+  })
   
   output$agePlot <- renderPlot({
     

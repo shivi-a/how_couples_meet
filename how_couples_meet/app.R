@@ -36,7 +36,8 @@ ui <- fluidPage(
                     h3("Correlations in Partner Ages"),
                     plotOutput("agePlot"),
                     h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
-                    br()
+                    br(),
+                    h3("Age differences - Calculated")
            ),
            tabPanel("When Couples Meet", 
                     plotOutput("meetPlot")),
@@ -51,13 +52,21 @@ tabPanel("Meet",
            br(),
            tabsetPanel(
              tabPanel("Types",
-                      h3("Types of Meetings")
+                      h3("Types of Meetings"),
+                      br(),
+                      tableOutput("meetTable")
              ),
              tabPanel("Classmates",
-                      h3("Did partners who went to the same high school or college meet as classmates?")
-                      #plotOutput("schoolPlot"),
-                      #plotOutput("collegePlot"),
-                      #plotOutput("classPlot")
+                      h3("Did partners who went to the same high school or college meet as classmates?"),
+                      br(),
+                      h5("Couples who went to the same high school, but different colleges"),
+                      tableOutput("schoolTable"),
+                      br(),
+                      h5("Couples who went to the same college, but different high schools"),
+                      tableOutput("collegeTable"),
+                      br(),
+                      h5("Couples who went to the same high school and college"),
+                      tableOutput("classTable")
                       
              )
            )
@@ -159,32 +168,43 @@ server <- function(input, output) {
     
    })
   
-  output$schoolPlot <- renderPlot({
+  output$schoolTable <- renderTable({
     
     gathered_couples %>% 
       filter(Q25 == "Same High School", 
              Q26 == "Did not attend same college or university") %>% 
       count(meeting_type) %>% 
-      arrange(desc(n)) 
+      arrange(desc(n)) %>% 
+      head(5)
       
     #divide by total number to get percentages then table or plot
   })
   
-  output$collegePlot <- renderPlot({
+  output$collegeTable <- renderTable({
     
     gathered_couples %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Different High School") %>% 
       count(meeting_type) %>% 
-      arrange(desc(n))
+      arrange(desc(n)) %>% 
+      head(5)
     
   })
   
-  output$classPlot <- renderPlot({
+  output$classTable <- renderTable({
     
     gathered_couples %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Same High School") %>% 
+      count(meeting_type) %>% 
+      arrange(desc(n)) %>% 
+      head(5)
+    
+  })
+  
+  output$meetTable <- renderTable ({
+    
+    gathered_couples %>% 
       count(meeting_type) %>% 
       arrange(desc(n))
     
@@ -264,5 +284,6 @@ server <- function(input, output) {
 }
 
 # Run the application 
+
 shinyApp(ui = ui, server = server)
 

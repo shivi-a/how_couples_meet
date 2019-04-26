@@ -11,50 +11,45 @@ library(ggthemes)
 # Read in data from rds file
 
 couples_data <- read_rds("couples_file.rds")
+gathered_couples <- read_rds("gathered_couples.rds")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   
-   # Sidebar with a slider input for number of bins 
    br(),
    
    navbarPage("How Couples Meet and Stay Together",
               tabPanel("Couple Characteristics",
-      mainPanel(
          tabsetPanel(
            tabPanel("Earnings",
+                    h3("Who Earns More? Earnings between Partners in the U.S."),
+                    br(),
                     sidebarPanel(
                       selectInput("education",
-                                  "Respondent Education Level:", unique(couples_data$ppeduc))
+                                  "Respondent Education Level:", unique(couples_data$ppeduc)),
+                      h6("The majority of men reported making more than their partners at all education levels"),
+                      h6("Women were more likely to report making less than their partner, except those with professional or doctorate degrees")
                     ),
-                    h3("Earnings between Partners in the US"),
+                    mainPanel(
                     plotOutput("incomePlot"),
-                    h4("The majority of men reported making more than their partners at all education levels. Women were more likely to report making less than their partner, except those with professional or doctorate degrees"),
                     br()
-                    ),
+                    )),
            tabPanel("Age",
                     h3("Correlations in Partner Ages"),
                     plotOutput("agePlot"),
                     h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
                     br(),
                     h3("Age differences - Calculated")
-           ),
-           tabPanel("When Couples Meet", 
-                    plotOutput("meetPlot")),
-           tabPanel("Marry",
-                    plotOutput("marryPlot"))
-         )
+           )
       )
    ),
 tabPanel("Meet",
-         mainPanel(
-           h2("Meetings"),
-           br(),
            tabsetPanel(
              tabPanel("Types",
                       h3("Types of Meetings"),
                       br(),
-                      tableOutput("meetTable")
+                      tableOutput("meetTable"),
+                      tableOutput("lgbTable")
              ),
              tabPanel("Classmates",
                       h3("Did partners who went to the same high school or college meet as classmates?"),
@@ -68,19 +63,29 @@ tabPanel("Meet",
                       h5("Couples who went to the same high school and college"),
                       tableOutput("classTable")
                       
-             )
-           )
+             ),
+             tabPanel("When",
+                      br(),
+                      sidebarPanel(
+                        radioButtons("region",
+                                     "Region:", unique(couples_data$ppreg9))
+                      ),
+                      mainPanel(
+                      plotOutput("meetPlot")
+                      ),
+                      h2("time to relationship start - calculate, ppincimp, stuff with interracial, political id, race"))
          )),
 tabPanel("Marry",
+         h3("When Do Couples Marry?"),
+         br(),
          sidebarPanel(
            radioButtons("region",
-                        "Region:", unique(couples_data$ppreg9))
-           ),
-         mainPanel(
-           h2("Marriage"),
-           h4("When do couples marry?"),
+                        "Region:", unique(couples_data$ppreg9)),
            h4("Among those married, how did they meet"),
            h4("How old when you married")
+           ),
+         mainPanel(
+           plotOutput("marryPlot")
          )),
 tabPanel("Stay Together",
          mainPanel(
@@ -205,6 +210,15 @@ server <- function(input, output) {
   output$meetTable <- renderTable ({
     
     gathered_couples %>% 
+      count(meeting_type) %>% 
+      arrange(desc(n))
+    
+  })
+  
+  output$lgbTable <- renderTable ({
+    
+    gathered_couples %>% 
+      filter(xlgb == "LGB sample") %>% 
       count(meeting_type) %>% 
       arrange(desc(n))
     

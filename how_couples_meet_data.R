@@ -25,7 +25,7 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
   
   gathered_couples <- 
     couples %>% 
-    gather(`_school`:`_met_online`, 
+    gather(`school`:`met_online`, 
            key = "meeting_type", 
            value = "value") %>% 
     filter(value == "yes")
@@ -33,6 +33,10 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
   # Remove in final script
   
   gathered_couples %>% count(meeting_type) %>% arrange(desc(n))
+  
+  gathered_couples %>% filter(Q5 == "Yes, we are a same-sex couple") %>% count(meeting_type) %>% arrange(desc(n))
+  
+  gathered_couples %>% filter(xlgb == "LGB sample") %>% count(meeting_type) %>% arrange(desc(n))
   
   gathered_couples %>% count(meeting_type) %>% arrange(desc(n)) %>% mutate(n = n / n())
   
@@ -53,7 +57,11 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
 
 couples_file <- tempfile()
 
+gathered_couples <- tempfile()
+
 # Write the R data structure to the temporary file
 
 write_rds(couples, "how_couples_meet/couples_file.rds")
+
+write_rds(gathered_couples, "how_couples_meet/gathered_couples.rds")
 

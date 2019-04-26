@@ -11,7 +11,7 @@ library(ggthemes)
 # Read in data from rds file
 
 couples_data <- read_rds("couples_file.rds")
-gathered_couples <- read_rds("gathered_couples.rds")
+gathered_couples_data <- read_rds("gathered_couples_file.rds")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -175,7 +175,7 @@ server <- function(input, output) {
   
   output$schoolTable <- renderTable({
     
-    gathered_couples %>% 
+    gathered_couples_data %>% 
       filter(Q25 == "Same High School", 
              Q26 == "Did not attend same college or university") %>% 
       count(meeting_type) %>% 
@@ -187,7 +187,7 @@ server <- function(input, output) {
   
   output$collegeTable <- renderTable({
     
-    gathered_couples %>% 
+    gathered_couples_data %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Different High School") %>% 
       count(meeting_type) %>% 
@@ -198,7 +198,7 @@ server <- function(input, output) {
   
   output$classTable <- renderTable({
     
-    gathered_couples %>% 
+    gathered_couples_data %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Same High School") %>% 
       count(meeting_type) %>% 
@@ -209,7 +209,7 @@ server <- function(input, output) {
   
   output$meetTable <- renderTable ({
     
-    gathered_couples %>% 
+    gathered_couples_data %>% 
       count(meeting_type) %>% 
       arrange(desc(n))
     
@@ -217,7 +217,7 @@ server <- function(input, output) {
   
   output$lgbTable <- renderTable ({
     
-    gathered_couples %>% 
+    gathered_couples_data %>% 
       filter(xlgb == "LGB sample") %>% 
       count(meeting_type) %>% 
       arrange(desc(n))

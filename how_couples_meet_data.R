@@ -57,11 +57,11 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
 
 couples_file <- tempfile()
 
-gathered_couples <- tempfile()
+gathered_couples_file <- tempfile()
 
 # Write the R data structure to the temporary file
 
 write_rds(couples, "how_couples_meet/couples_file.rds")
 
-write_rds(gathered_couples, "how_couples_meet/gathered_couples.rds")
+write_rds(gathered_couples, "how_couples_meet/gathered_couples_file.rds")
 

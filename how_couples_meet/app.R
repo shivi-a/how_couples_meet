@@ -5,8 +5,8 @@ library(tidyverse)
 library(ggplot2)
 library(stringr)
 library(gt)
-library(lubridate)
 library(forcats)
+library(plotly)
 library(ggthemes)
 
 # Read in data from rds file
@@ -34,7 +34,6 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                       h6("Add about same-sex couples?")
                     ),
                     mainPanel(
-                    plotOutput("incomePlot"),
                     plotlyOutput("incomePlotly"),
                     br()
                     )),
@@ -107,14 +106,16 @@ tabPanel("Stay Together",
 tabPanel("About",
          mainPanel(
            h2("The Data"),
-           h5("Thanks to data from the ", a("Social Science Data Collection", href="https://data.stanford.edu/hcmst2017"), " at Stanford University, we can understand trends among couples and how they meet in the US"),
-           h5("This data was collected between July 13 and August 1, 2017, and featured 3,510 survey respondents - a representative sample of English literate adults in the US"),
+           h5("These visualizations are based on data from the ", a("How Couples Meet and Stay Together 2017 Survey", href="https://data.stanford.edu/hcmst2017"), " , put together by Michael J. Rosenfeld, Reuben J. Thomas, and Sonia Hausen, and part of the SSDS Social Science Data Collection at Stanford University"),
+           h5("This data was collected between July 13 and August 1, 2017, and featured 3,510 survey respondents - a representative sample of English literate adults in the U.S."),
+           h5("Questions were asked to subjects with current partners (N=2862) and to subjects with no current partner, but who had a past partner (N=541)"),
            h5("Citation"),
            h6("Rosenfeld, Michael J., Reuben J. Thomas, and Sonia Hausen. 2019 How Couples Meet and Stay Together 2017 fresh sample. Stanford, CA: Stanford University Libraries."),
-           h2("Shiny App Developed by Shivani Aggarwal"),
-           h5("Contact me at saggarwal@college.harvard.edu"),
+           h2("About Me: Shivani Aggarwal"),
+           h5("I am a Harvard undergraduate studying biology and passionate about data science. This app was developed as a final project for the class GOV 1005: Data, taught by David Kane."),
+           h5("Contact me at saggarwal@college.harvard.edu or connect with me on LinkedIn", a("HERE", href="https://www.linkedin.com/in/s-aggarwal/")),
            h2("Source Code"),
-           h5("The source code for this Shiny App can be found", a("HERE", href="https://github.com/shivi-a/how_couples_meet"))
+           h5("The source code for this Shiny App can be found at my GitHub", a("HERE", href="https://github.com/shivi-a/how_couples_meet"))
          ))
 ))
 
@@ -162,45 +163,6 @@ server <- function(input, output) {
       labs(x = NULL, y = NULL)
       
     hide_legend(ggplotly(income))
-    
-  })
-
-  output$incomePlot <- renderPlot({
-    
-    couples_data %>% 
-      
-      filter(ppeduc == input$education) %>% 
-    
-      mutate(Q23 = fct_relevel(Q23, 
-                               "We earned about the same amount",
-                               "[Partner Name] earned more", 
-                               "I earned more")) %>% 
-      
-      mutate(Q23 = fct_recode(Q23,"We earned about the same" = "We earned about the same amount", "My partner earned more" = "[Partner Name] earned more")) %>% 
-      
-      mutate(ppgender = fct_recode(ppgender, "Male Respondents" = "Male", "Female Respondents" = "Female")) %>% 
-      
-      # Removed those who refused from the dataset as well as those who reported that their partner was not working for pay -- a small total that do not contribute to any major trends
-      
-      filter(!is.na(Q23), 
-             Q23 != "Refused", 
-             Q23 != "[Partner Name] was not working for pay") %>%  
-      
-      # Create bar chart based on responses for Q23 (respondent's pay versus partner's pay)
-      
-      ggplot(aes(x = Q23, fill = ppgender)) + 
-      
-      geom_bar(show.legend=FALSE) + 
-      
-      facet_wrap(~ppgender) + 
-      
-      coord_flip() + 
-      
-      theme_few() + 
-      
-      scale_fill_manual(values = c("dodgerblue4", "deeppink4")) +
-      
-      labs(x = NULL, y = NULL)
     
   })
   
@@ -285,7 +247,7 @@ server <- function(input, output) {
     
     # FIX formatting
     
-    gg <- couples %>% 
+    gg <- couples_data %>% 
       ggplot(aes(x = age_when_met)) + 
       geom_histogram(binwidth = 1) + 
       labs(y = NULL) +

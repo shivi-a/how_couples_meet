@@ -42,8 +42,36 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
   
   gathered_couples %>% group_by(ppeduc) %>% count(meeting_type) %>% arrange(desc(n)) %>% View()
   
-  gathered_couples2 <- gathered_couples %>% gather(`_R_cowork`:`_btwn_I_neighbor`, key = "connections", value = "connect_value") %>% filter(connect_value == "yes")
+  gathered_couples2 <- gathered_couples %>% gather(`R_cowork`:`btwn_I_neighbor`, key = "connections", value = "connect_value") %>% filter(connect_value == "yes")
 
+  gathered_couples %>% filter(meeting_type == "blind_date") %>% count(PPREG4)
+  
+  gathered_couples %>% 
+    filter(met_through_family != "yes" 
+           & met_through_as_nghbrs != "yes" 
+           & met_through_friend != "yes" 
+           & met_as_through_cowork != "yes") %>% 
+    count(meeting_type) %>% 
+    arrange(desc(n))
+  
+  c4 <- couples %>% filter(met_through_family != "yes" 
+                     & met_through_as_nghbrs != "yes" 
+                     & met_through_friend != "yes" 
+                     & met_as_through_cowork != "yes") %>%
+    gather(`school`:`met_online`, 
+           key = "meeting_type", 
+           value = "value") %>% 
+    filter(value == "yes")
+  
+  gathered_couples %>% filter(meeting_type == "college") %>% 
+    count(met_through_friend) %>% 
+    arrange(desc(n))
+  
+  
+  # blind dates
+  
+  gathered_couples %>% filter(meeting_type == "blind_date") %>% count(ppagecat)
+  
   couples_orig <- read.dta13("HCMST_ver_3.04.dta")
   
   gathered_couples %>% filter(Q25 == "Same High School") %>% count(meeting_type) %>% arrange(desc(n))
@@ -65,3 +93,54 @@ write_rds(couples, "how_couples_meet/couples_file.rds")
 
 write_rds(gathered_couples, "how_couples_meet/gathered_couples_file.rds")
 
+
+c4 <- couples %>% filter(met_through_family != "yes" 
+                         & met_through_as_nghbrs != "yes" 
+                         & met_through_friend != "yes" 
+                         & met_as_through_cowork != "yes") %>%
+  gather(`school`:`met_online`, 
+         key = "meeting_type", 
+         value = "value") %>% 
+  filter(value == "yes") %>% count(meeting_type) %>% arrange(desc(n))
+
+#regardless of income, meeting the same ways
+
+htmlwidgets::saveWidget(config(x, displayModeBar = FALSE), "graph.html")
+
+couples %>% filter(Q12 != "Refused") %>% group_by(Q12, partyid7) %>% count()
+
+couples %>% filter(Q12 != "Refused") %>% group_by(Q12, partyid7) %>% count() %>% View()
+
+gathered_couples %>% filter(meeting_type == "church") %>% count(ppincimp)
+
+couples %>% filter(partnership_status == "married") %>% gather(`school`:`met_online`, 
+                                                               key = "meeting_type", 
+                                                               value = "value") %>% 
+  filter(value == "yes") %>% count(meeting_type) %>% arrange(desc(n))
+
+couples %>% filter(partnership_status == "partnered, not married") %>% gather(`school`:`met_online`, 
+                                                                              key = "meeting_type", 
+                                                                              value = "value") %>% 
+  filter(value == "yes") %>% count(meeting_type) %>% arrange(desc(n))
+
+x <- couples %>% ggplot(aes(x = age_when_met)) + geom_histogram(binwidth = 1) + theme_few()
+
+couples %>% filter(interracial_5cat == "yes") %>% ggplot(aes(x = age_when_met)) + geom_histogram(bins = 20) + theme_few()
+
+couples %>% ggplot(aes(x = time_from_rel_to_cohab)) + geom_histogram() + theme_few()
+
+couples %>% ggplot(aes(x = time_from_met_to_rel)) + geom_histogram() + theme_few()
+
+couples %>% filter(time_from_rel_to_cohab < 3) %>%  ggplot(aes(x = time_from_rel_to_cohab)) + geom_histogram(bins = 30) + theme_few()
+#month breakup graph
+
+#same sex couple stuff
+#w6_same_sex_couple_gender
+
+gathered_couples %>% filter(w6_same_sex_couple_gender != "hetero couple") %>% count(meeting_type) %>% arrange(desc(n))
+
+gathered_couples %>% filter(w6_same_sex_couple_gender == "lesbian couple") %>% count(meeting_type) %>% arrange(desc(n))
+
+gathered_couples %>% filter(w6_same_sex_couple_gender == "gay male couple") %>% count(meeting_type) %>% arrange(desc(n))
+
+couples %>% filter(w6_same_sex_couple_gender != "hetero couple") %>% ggplot(aes(x = age_when_met)) + geom_histogram(bins = 70) + theme_few()

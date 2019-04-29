@@ -1,5 +1,6 @@
 
 library(shiny)
+library(shinythemes)
 library(tidyverse)
 library(ggplot2)
 library(stringr)
@@ -11,10 +12,11 @@ library(ggthemes)
 # Read in data from rds file
 
 couples_data <- read_rds("couples_file.rds")
+
 gathered_couples_data <- read_rds("gathered_couples_file.rds")
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("sandstone"),
   
    br(),
    
@@ -28,15 +30,24 @@ ui <- fluidPage(
                       selectInput("education",
                                   "Respondent Education Level:", unique(couples_data$ppeduc)),
                       h6("The majority of men reported making more than their partners at all education levels"),
-                      h6("Women were more likely to report making less than their partner, except those with professional or doctorate degrees")
+                      h6("Women were more likely to report making less than their partner, except those with professional or doctorate degrees"),
+                      h6("Add about same-sex couples?")
                     ),
                     mainPanel(
                     plotOutput("incomePlot"),
+                    plotlyOutput("incomePlotly"),
                     br()
                     )),
            tabPanel("Age",
-                    h3("Correlations in Partner Ages"),
+                    h3("At What Age Did you Meet Your Partner?"),
+                    plotlyOutput("ageHist"),
                     plotOutput("agePlot"),
+                    h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
+                    br(),
+                    h3("Age differences - Calculated")
+           ),
+           tabPanel("Political Affiliation",
+                    h3("Correlations in Partner Ages"),
                     h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
                     br(),
                     h3("Age differences - Calculated")
@@ -50,14 +61,15 @@ tabPanel("Meet",
                       br(),
                       tableOutput("meetTable"),
                       tableOutput("lgbTable")
+                      #strangers
              ),
              tabPanel("Classmates",
                       h3("Did partners who went to the same high school or college meet as classmates?"),
                       br(),
-                      h5("Couples who went to the same high school, but different colleges"),
+                      h5("Couples who went to the same high school (different colleges)"),
                       tableOutput("schoolTable"),
                       br(),
-                      h5("Couples who went to the same college, but different high schools"),
+                      h5("Couples who went to the same college (different high schools)"),
                       tableOutput("collegeTable"),
                       br(),
                       h5("Couples who went to the same high school and college"),
@@ -99,6 +111,8 @@ tabPanel("About",
            h5("This data was collected between July 13 and August 1, 2017, and featured 3,510 survey respondents - a representative sample of English literate adults in the US"),
            h5("Citation"),
            h6("Rosenfeld, Michael J., Reuben J. Thomas, and Sonia Hausen. 2019 How Couples Meet and Stay Together 2017 fresh sample. Stanford, CA: Stanford University Libraries."),
+           h2("Shiny App Developed by Shivani Aggarwal"),
+           h5("Contact me at saggarwal@college.harvard.edu"),
            h2("Source Code"),
            h5("The source code for this Shiny App can be found", a("HERE", href="https://github.com/shivi-a/how_couples_meet"))
          ))
@@ -108,6 +122,49 @@ tabPanel("About",
 
 server <- function(input, output) {
   
+  output$incomePlotly <- renderPlotly({
+    
+    income <- 
+      
+      couples_data %>% 
+      
+      filter(ppeduc == input$education) %>% 
+      
+      mutate(Q23 = fct_relevel(Q23, 
+                               "We earned about the same amount",
+                               "[Partner Name] earned more", 
+                               "I earned more")) %>% 
+      
+      mutate(Q23 = fct_recode(Q23,"We earned about the same" = "We earned about the same amount", "My partner earned more" = "[Partner Name] earned more")) %>% 
+      
+      mutate(ppgender = fct_recode(ppgender, "Male Respondents" = "Male", "Female Respondents" = "Female")) %>% 
+      
+      # Removed those who refused from the dataset as well as those who reported that their partner was not working for pay -- a small total that do not contribute to any major trends
+      
+      filter(!is.na(Q23), 
+             Q23 != "Refused", 
+             Q23 != "[Partner Name] was not working for pay") %>%  
+      
+      # Create bar chart based on responses for Q23 (respondent's pay versus partner's pay)
+      
+      ggplot(aes(x = Q23, fill = ppgender)) + 
+      
+      geom_bar(show.legend=FALSE) + 
+      
+      facet_wrap(~ppgender) + 
+      
+      coord_flip() + 
+      
+      theme_few() + 
+      
+      scale_fill_manual(values = c("dodgerblue4", "deeppink4")) +
+      
+      labs(x = NULL, y = NULL)
+      
+    hide_legend(ggplotly(income))
+    
+  })
+
   output$incomePlot <- renderPlot({
     
     couples_data %>% 
@@ -153,7 +210,7 @@ server <- function(input, output) {
       
       # draw the histogram with the specified number of bins
       
-      ggplot(region_subset, aes(x = Q21A_Month, fill = Q21A_Month)) + 
+      ggplot(region_subset, aes(x = Q21A_Month)) + 
         
         # Hide the legend for a cleaner plot
         
@@ -224,6 +281,21 @@ server <- function(input, output) {
     
   })
   
+  output$ageHist <- renderPlotly({
+    
+    # FIX formatting
+    
+    gg <- couples %>% 
+      ggplot(aes(x = age_when_met)) + 
+      geom_histogram(binwidth = 1) + 
+      labs(y = NULL) +
+      theme_few()
+    
+    ggplotly(gg)
+    
+  })
+  
+  
   output$agePlot <- renderPlot({
     
     # Create graphic to show the relationship between respondent's age and their partner's age -- are most reporting partners who are older than them? How does this differ according to the sex of the respondent?
@@ -276,7 +348,7 @@ server <- function(input, output) {
     
     # draw the histogram with the specified number of bins
     
-    ggplot(region_subset, aes(x = Q21D_Month, fill = Q21D_Month)) + 
+    ggplot(region_subset, aes(x = Q21D_Month)) + 
       
       # Hide the legend for a cleaner plot
       

@@ -81,6 +81,9 @@ tabPanel("Meet",
                       tableOutput("classTable")
                       
              ),
+             tabPanel("Strangers",
+                      h3("Coming soon! - How do couples with no prior connections (friends, family, coworkers, neighbors) meet?")
+             ),
              tabPanel("When",
                       h3("When Do Couples Meet?"),
                       br(),

@@ -22,7 +22,7 @@ Repo Guide
 + /past_project_critiques : contains analysis of other Shiny Apps, done as part of the early brainstorming process   
   
 + .gitignore  
-+ HCMST 2017 fresh sample: data in .dta format  
++ HCMST 2017 fresh sample : data in .dta format  
 + README.md  
 + how_couples_meet_data.R : R script that reads the .dta file and creates necessary RDS files read in by the Shiny App  
 

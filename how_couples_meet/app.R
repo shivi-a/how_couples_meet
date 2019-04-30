@@ -8,6 +8,7 @@ library(gt)
 library(forcats)
 library(plotly)
 library(ggthemes)
+library(DT)
 
 # Read in data from rds file for both the original dataframe, as well as the
 # reshaped version which can be more easily manipulated to analyze meeting types
@@ -149,18 +150,21 @@ tabPanel("Meet",
              # popular meeting types
              
              tabPanel("Types",
-                      h3("Types of Meetings"),
+                      h3("How Do Couples Meet?"),
                       br(),
                       
                       # Include the most common meeting type table for the whole
                       # sample
+                      h4("Full Sample"),
+                      DTOutput("meetTable"),
                       
-                      tableOutput("meetTable"),
+                      br(),
                       
                       # Include the most common meeting type table for the whole
                       # LGBTQ sample
                       
-                      tableOutput("lgbTable")
+                      h4("LGBTQ Sample"),
+                      DTOutput("lgbTable")
              ),
              
              # Devote a separate section to exploring how couples who were
@@ -173,7 +177,7 @@ tabPanel("Meet",
                       # For each line of inquiry, I provided a corresponding
                       # table of the top five ways in which those couples met
                       
-                      h3("Did partners who went to the same high school or college meet as classmates?"),
+                      h3("Did Couples Who Attended the Same High School or College Meet as Classmates?"),
                       br(),
                       
                       # In the future, I plan to tweak this to involve a bar
@@ -181,7 +185,7 @@ tabPanel("Meet",
                       # table
                       
                       h5("Couples who went to the same high school (different colleges)"),
-                      tableOutput("schoolTable"),
+                      DTOutput("schoolTable"),
                       
                       # Line breaks provide aesthetic clarity between the groupings
                       
@@ -192,11 +196,11 @@ tabPanel("Meet",
                       # same for both in order to prevent overlapping effects
                       
                       h5("Couples who went to the same college (different high schools)"),
-                      tableOutput("collegeTable"),
+                      DTOutput("collegeTable"),
                       
                       br(),
                       h5("Couples who went to the same high school and college"),
-                      tableOutput("classTable")
+                      DTOutput("classTable")
                       
              ),
              
@@ -411,54 +415,54 @@ server <- function(input, output) {
     
    })
   
-  output$schoolTable <- renderTable({
+  output$schoolTable <- renderDT({
     
-    gathered_couples_data %>% 
+    datatable((gathered_couples_data %>% 
       filter(Q25 == "Same High School", 
              Q26 == "Did not attend same college or university") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)
+      head(5)), colnames=c("Meeting Type", "Frequency"))
       
     #divide by total number to get percentages then table or plot
   })
   
-  output$collegeTable <- renderTable({
+  output$collegeTable <- renderDT({
     
-    gathered_couples_data %>% 
+    datatable((gathered_couples_data %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Different High School") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)
+      head(5)), colnames=c("Meeting Type", "Frequency"))
     
   })
   
-  output$classTable <- renderTable({
+  output$classTable <- renderDT({
     
-    gathered_couples_data %>% 
+    datatable((gathered_couples_data %>% 
       filter(Q26 == "Attended same college or university", 
              Q25 == "Same High School") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)
+      head(5)), colnames=c("Meeting Type", "Frequency"))
     
   })
   
-  output$meetTable <- renderTable ({
+  output$meetTable <- renderDT ({
     
-    gathered_couples_data %>% 
+    datatable((gathered_couples_data %>% 
       count(meeting_type) %>% 
-      arrange(desc(n))
+      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"))
     
   })
   
-  output$lgbTable <- renderTable ({
+  output$lgbTable <- renderDT ({
     
-    gathered_couples_data %>% 
+    datatable((gathered_couples_data %>% 
       filter(xlgb == "LGB sample") %>% 
       count(meeting_type) %>% 
-      arrange(desc(n))
+      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"))
     
   })
   

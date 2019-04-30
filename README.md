@@ -6,11 +6,13 @@ Shiny App found [HERE](https://shivi-a.shinyapps.io/how_couples_meet/)
 
 Project Rationale
 ------
-Though the first "How Couples Meet and Stay Together" survey was conducted by Rosenfeld and his colleagues in 2009, this represents a completely new sample of individuals. The data was collected between July 13 and August 1, 2017, and just released in October of 2018. 
-
 HCMST 2017 is intriguing as one of the few datasets from a comprehensive, representative survey of U.S. literate couples. 
 
+Though the first "How Couples Meet and Stay Together" survey was conducted by Rosenfeld and his colleagues in 2009, this represents a completely new sample of individuals. The data was collected between July 13 and August 1, 2017, and just released in October of 2018. 
+
 How individuals find a partner is a subject of near universal interest - particularly to a young college student witnessing committed relationships, hookups, and everything in between. 
+
+With my visualizations, I sought to answer questions related to the different ways in which couples meet.
 
 Repo Guide
 ------

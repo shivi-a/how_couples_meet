@@ -495,6 +495,11 @@ server <- function(input, output) {
       
       labs(y = NULL, x = "Respondent's Age At First Meeting") +
       
+      # Add more frequent x-axis labels to better contextualize an axis about
+      # ages
+      
+      scale_x_continuous(breaks = seq(0, 85, by = 10)) +
+      
       # Use theme_few for a cleaner, consistent output
       
       theme_few()

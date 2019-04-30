@@ -19,6 +19,9 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
                               "Bachelors degree", 
                               "Masters degree", 
                               "Professional or Doctorate degree")) %>% 
+  mutate(w6_same_sex_couple = fct_recode(w6_same_sex_couple, 
+                                         "Heterosexual Couples" = "NOT same-sex souple",
+                                         "Same Sex Couples" = "same_sex_couple")) %>% 
   mutate(marry_age = as.numeric(Q21D_Year) - (2017 - ppage))
 
   colnames(couples) <- gsub('hcm2017q24_', '', colnames(couples))

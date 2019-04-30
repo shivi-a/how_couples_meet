@@ -28,10 +28,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                     br(),
                     sidebarPanel(
                       selectInput("education",
-                                  "Respondent Education Level:", unique(couples_data$ppeduc)),
+                                  "Respondent Education Level:", levels(couples_data$ppeduc)),
                       h6("The majority of men reported making more than their partners at all education levels"),
-                      h6("Women were more likely to report making less than their partner, except those with professional or doctorate degrees"),
-                      h6("Add about same-sex couples?")
+                      h6("Women were more likely to report making less than their partner, except those with professional or doctorate degrees")
                     ),
                     mainPanel(
                     plotlyOutput("incomePlotly"),
@@ -39,17 +38,24 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                     )),
            tabPanel("Age",
                     h3("At What Age Did you Meet Your Partner?"),
-                    plotlyOutput("ageHist"),
-                    plotOutput("agePlot"),
-                    h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
                     br(),
-                    h3("Age differences - Calculated")
+                    sidebarPanel(
+                      radioButtons("identity",
+                                   "Couple Identity:",
+                                   levels(couples_data$w6_same_sex_couple)),
+                      h6("The sample size for LGBTQ couples is much smaller, but the histograms nonetheless suggest that same sex couples tend to meet later in life than heterosexual couples")
+                    ),
+                    mainPanel(
+                      plotlyOutput("ageHist"),
+                      br(),
+                      h2("Correlations between Partner Ages"),
+                      plotlyOutput("agePlot"),
+                      h4("Pink points indicate female respondents; blue points indicate male respondents"),
+                      h4("Women tended to report older partners, while men reported younger partners")
+                    )
            ),
            tabPanel("Political Affiliation",
-                    h3("Correlations in Partner Ages"),
-                    h4("Points on the dashed line indicate respondents reporting a partner of the same age. Women tended to report older partners, while men reported younger partners"),
-                    br(),
-                    h3("Age differences - Calculated")
+                    h3("Coming Soon!")
            )
       )
    ),
@@ -76,32 +82,32 @@ tabPanel("Meet",
                       
              ),
              tabPanel("When",
+                      h3("When Do Couples Meet?"),
                       br(),
                       sidebarPanel(
                         radioButtons("region",
-                                     "Region:", unique(couples_data$ppreg9))
+                                     "Region:", unique(couples_data$ppreg9)),
+                        h5("There is regional variation in when couples tend to meet")
                       ),
                       mainPanel(
-                      plotOutput("meetPlot")
-                      ),
-                      h2("time to relationship start - calculate, ppincimp, stuff with interracial, political id, race"))
+                      plotlyOutput("meetPlot")
+                      ))
          )),
 tabPanel("Marry",
          h3("When Do Couples Marry?"),
          br(),
          sidebarPanel(
-           radioButtons("region",
+           radioButtons("region_marry",
                         "Region:", unique(couples_data$ppreg9)),
-           h4("Among those married, how did they meet"),
-           h4("How old when you married")
+           h5("There is regional variation in when couples tend to marry")
            ),
          mainPanel(
-           plotOutput("marryPlot")
+           plotlyOutput("marryPlot")
          )),
 tabPanel("Stay Together",
          mainPanel(
            h2("Stay Together"),
-           h4("The previous data involves six waves of data")
+           h4("The previous data involves five waves of data on the same couples, tracked over several years. Findings from that data will be here.")
          )),
 tabPanel("About",
          mainPanel(
@@ -166,13 +172,13 @@ server <- function(input, output) {
     
   })
   
-  output$meetPlot <- renderPlot({
+  output$meetPlot <- renderPlotly({
 
       region_subset <- couples_data %>% filter(Q21A_Month != "Refused", ppreg9 == input$region)
       
       # draw the histogram with the specified number of bins
       
-      ggplot(region_subset, aes(x = Q21A_Month)) + 
+      meet <- ggplot(region_subset, aes(x = Q21A_Month)) + 
         
         # Hide the legend for a cleaner plot
         
@@ -189,6 +195,8 @@ server <- function(input, output) {
         # Add labels to contextualize plot - X and Y axis labels are not needed
         
         labs(x = NULL, y = NULL)
+      
+      ggplotly(meet)
     
    })
   
@@ -244,13 +252,17 @@ server <- function(input, output) {
   })
   
   output$ageHist <- renderPlotly({
-    
-    # FIX formatting
-    
-    gg <- couples_data %>% 
+
+    gg <- couples_data %>% filter(w6_same_sex_couple == input$identity) %>% 
+      
       ggplot(aes(x = age_when_met)) + 
+      
       geom_histogram(binwidth = 1) + 
-      labs(y = NULL) +
+      
+      # Consider switching to a geom_density plot? geom_density(adjust = 1/4, alpha = 0.1)
+      
+      labs(y = NULL, x = "Respondent's Age At First Meeting") +
+      
       theme_few()
     
     ggplotly(gg)
@@ -258,11 +270,11 @@ server <- function(input, output) {
   })
   
   
-  output$agePlot <- renderPlot({
+  output$agePlot <- renderPlotly({
     
     # Create graphic to show the relationship between respondent's age and their partner's age -- are most reporting partners who are older than them? How does this differ according to the sex of the respondent?
     
-    couples_data %>% 
+    age <- couples_data %>% 
       
       # Remove those who refused to answer this question (coded by a value of "-1")
       filter(Q9 != -1) %>% 
@@ -301,16 +313,18 @@ server <- function(input, output) {
       scale_x_continuous(breaks = seq(0, 100, by = 10)) + 
       
       scale_y_continuous(breaks = seq(0, 100, by = 10))
+    
+    hide_legend(ggplotly(age))
   
   })
   
-  output$marryPlot <- renderPlot({
+  output$marryPlot <- renderPlotly({
     
-    region_subset <- couples_data %>% filter(Q21D_Month != "Refused", ppreg9 == input$region)
+    region_subset <- couples_data %>% filter(Q21D_Month != "Refused", ppreg9 == input$region_marry)
     
     # draw the histogram with the specified number of bins
     
-    ggplot(region_subset, aes(x = Q21D_Month)) + 
+    marry <- ggplot(region_subset, aes(x = Q21D_Month)) + 
       
       # Hide the legend for a cleaner plot
       
@@ -327,6 +341,8 @@ server <- function(input, output) {
       # Add labels to contextualize plot - X and Y axis labels are not needed
       
       labs(x = NULL, y = NULL)
+    
+    ggplotly(marry)
     
   })
 }

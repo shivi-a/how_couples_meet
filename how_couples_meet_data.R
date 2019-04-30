@@ -63,6 +63,32 @@ colnames(couples) <- gsub('hcm2017q24_', '', colnames(couples))
            key = "meeting_type", 
            value = "value") %>% 
     
+    # Recode different meeting type values to properly formatted, informative
+    # factor labels for the Shiny App UI
+    
+    mutate(meeting_type = fct_recode(meeting_type, 
+                                     "Primary or Secondary School" = "school",
+                                     "College" = "college",
+                                     "Military"  = "mil",
+                                     "Church" = "church",
+                                     "Volunteer Organization" = "vol_org",
+                                     "Customer-Client Relationship" = "customer",
+                                     "Bar or Restaurant" = "bar_restaurant",
+                                     "Private Party" = "party",
+                                     "Internet" = "internet_other",
+                                     "Internet Dating or Phone App" = "internet_dating",
+                                     "Internet Social Network" = "internet_soc_network",
+                                     "Online Gaming" = "internet_game",
+                                     "Internet Chat" = "internet_chat",
+                                     "Internet Site" = "internet_org",
+                                     "Public Place" = "public",
+                                     "Blind Date" = "blind_date",
+                                     "On Vacation" = "vacation",
+                                     "Single Service" = "single_service_nonint",
+                                     "Business Trip" = "business_trip",
+                                     "Work Neighbors" = "work_neighbors",
+                                     "Met Online" = "met_online")) %>% 
+    
     # Filter only for those with a value of "yes" to remove irrelevant rows
     # generated when the data was reshaped - each caseID now has a row for each
     # meeting type, but only the ones where a given meeting type occurred

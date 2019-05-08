@@ -32,8 +32,28 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
                               "Some college, no degree", 
                               "High school graduate", 
                               "Associate degree", 
-                              "Bachelors degree", 
-                              "Masters degree", 
+                              "Bachelor's degree", 
+                              "Master's degree", 
+                              "Professional or Doctorate degree")) %>%
+  
+  mutate(w6_q10 = fct_lump(w6_q10, 6, 
+                           other_level = "Never graduated high school"),
+         
+         # Recode respondent education levels for more sensible factor names,
+         # that will be reflected in the Shiny App UI
+         
+         w6_q10 = fct_recode(w6_q10, "High school graduate" = "HS graduate or GED"),
+         
+         # Reorder respondent education factor levels to reflect an ascending
+         # order of education completed, which will be reflected in the Shiny
+         # App UI selector
+         
+         w6_q10 = fct_relevel(w6_q10, "Never graduated high school", 
+                              "Some college, no degree", 
+                              "High school graduate", 
+                              "Associate degree", 
+                              "Bachelor's degree", 
+                              "Master's degree", 
                               "Professional or Doctorate degree")) %>% 
   
   # Recode couple identity levels for more sensible factor names,
@@ -84,7 +104,7 @@ colnames(couples) <- gsub('hcm2017q24_', '', colnames(couples))
                                      "Public Place" = "public",
                                      "Blind Date" = "blind_date",
                                      "On Vacation" = "vacation",
-                                     "Single Service" = "single_service_nonint",
+                                     "One-time Service Interaction" = "single_serve_nonint",
                                      "Business Trip" = "business_trip",
                                      "Work Neighbors" = "work_neighbors",
                                      "Met Online" = "met_online")) %>% 

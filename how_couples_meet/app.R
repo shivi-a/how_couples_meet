@@ -68,7 +68,10 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                       
                       plotlyOutput("incomePlotly"),
                     br()
-                    )),
+                    ),
+                    DTOutput("educTable"),
+                    br()
+                    ),
            
            # Include a tab to organize visualizations related to information
            # about partners' ages
@@ -132,7 +135,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
            # other
            
            tabPanel("Political Affiliation",
-                    h3("Coming Soon!")
+                    h3("Do people tend to partner with those of a similar political affiliation?"),
+                    DTOutput("poliTable")
+                    
            )
       )
    ),
@@ -156,6 +161,7 @@ tabPanel("Meet",
                       # Include the most common meeting type table for the whole
                       # sample
                       h4("Full Sample"),
+                      plotlyOutput("heteroMeetPlot"),
                       DTOutput("meetTable"),
                       
                       br(),
@@ -164,6 +170,7 @@ tabPanel("Meet",
                       # LGBTQ sample
                       
                       h4("LGBTQ Sample"),
+                      plotlyOutput("lgbtMeetPlot"),
                       DTOutput("lgbTable")
              ),
              
@@ -214,6 +221,11 @@ tabPanel("Meet",
              tabPanel("Strangers",
                       h3("Coming soon! - How do couples with no prior connections (friends, family, coworkers, neighbors) meet?")
              ),
+             
+             tabPanel("Over Time",
+                      h3("Frequency of meeting types as a function of age"),
+                      plotlyOutput("timeMeet")
+                      ),
              
              # Create a tab with information about when couples meet. One might
              # expect this to be evenly and randomly distributed across the
@@ -274,7 +286,7 @@ tabPanel("Marry",
 tabPanel("Stay Together",
          mainPanel(
            h2("Stay Together"),
-           h4("The previous data involves five waves of data on the same couples, tracked over several years. Findings from that data will be here.")
+           h4("What month do couples break up? How long is the average relationship duration before a breakup?")
          )),
 
 # Include ABOUT tab with important background information and attributions, but
@@ -304,7 +316,7 @@ tabPanel("About",
            # Include information about the app author so that anyone impressed by my Shiny App can contact me to offer me a job
            
            h2("About Me: Shivani Aggarwal"),
-           h5("I am a Harvard undergraduate studying biology and passionate about data science. This app was developed as a final project for the class GOV 1005: Data, taught by David Kane."),
+           h5("I am a Harvard undergraduate studying biology and passionate about data science."),
            h5("Contact me at saggarwal@college.harvard.edu or connect with me on LinkedIn", a("HERE", href="https://www.linkedin.com/in/s-aggarwal/")),
            
            # Include a link to the Source Code for reproducibility and credibility
@@ -382,7 +394,22 @@ server <- function(input, output) {
     
     # Convert ggplot to plotly for a sharper output
     
-    hide_legend(ggplotly(income))
+    hide_legend(ggplotly(income)) 
+    
+  })
+  
+  output$timeMeet <- renderPlotly({
+    
+    ggplotly(gathered_couples_data %>% 
+      filter(meeting_type != "Internet Site") %>% 
+      ggplot(aes(x = ppage, fill = meeting_type)) + 
+      geom_density() + 
+      labs(y = NULL, x = "Respondent's Age") + 
+      theme_few() + xlim(0, 100) + 
+      facet_wrap(~meeting_type) + 
+      theme(legend.position="none")) %>% 
+      
+      config(displayModeBar = FALSE)
     
   })
   
@@ -411,7 +438,9 @@ server <- function(input, output) {
       
       # Convert ggplot2 into plotly for sharper, crisper output
       
-      ggplotly(meet)
+      ggplotly(meet) %>% 
+        layout(xaxis = list(tickangle = 20)) %>% 
+        config(displayModeBar = FALSE)
     
    })
   
@@ -422,7 +451,8 @@ server <- function(input, output) {
              Q26 == "Did not attend same college or university") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"))
+      head(5)), colnames=c("Meeting Type", "Frequency"),
+      options = list(dom = 'pt'))
       
     #divide by total number to get percentages then table or plot
   })
@@ -434,7 +464,8 @@ server <- function(input, output) {
              Q25 == "Different High School") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"))
+      head(5)), colnames=c("Meeting Type", "Frequency"),
+      options = list(dom = 'pt'))
     
   })
   
@@ -445,7 +476,8 @@ server <- function(input, output) {
              Q25 == "Same High School") %>% 
       count(meeting_type) %>% 
       arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"))
+      head(5)), colnames=c("Meeting Type", "Frequency"),
+      options = list(dom = 'pt'))
     
   })
   
@@ -453,7 +485,8 @@ server <- function(input, output) {
     
     datatable((gathered_couples_data %>% 
       count(meeting_type) %>% 
-      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"))
+      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"), 
+      options = list(dom = 'pt'))
     
   })
   
@@ -462,7 +495,53 @@ server <- function(input, output) {
     datatable((gathered_couples_data %>% 
       filter(xlgb == "LGB sample") %>% 
       count(meeting_type) %>% 
-      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"))
+      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"),
+      options = list(dom = 'pt'))
+    
+  })
+  
+  output$educTable <- renderDT ({
+  
+    datatable(couples_data %>% 
+        filter(!is.na(w6_q10)) %>% 
+        group_by(ppeduc, w6_q10) %>%
+        count() %>% spread(key = w6_q10, value = n, fill = 0),
+        options = list(dom = 't'))
+  })
+  
+  output$poliTable <- renderDT ({
+    
+    datatable(couples_data %>% 
+                filter(!is.na(w6_q12), w6_q12 != "Refused") %>% 
+                group_by(partyid7, w6_q12) %>%
+                count() %>% spread(key = w6_q12, value = n, fill = 0),
+              options = list(dom = 't'))
+  })
+  
+  output$heteroMeetPlot <- renderPlotly({
+    
+    ggplotly(gathered_couples_data %>% 
+               count(meeting_type) %>% 
+               ggplot(aes(x = reorder(meeting_type, -n), y = n)) + 
+               geom_col() + 
+               labs(x = NULL, y = NULL) +
+               theme_few()) %>% 
+      layout(xaxis = list(tickangle = 20)) %>% 
+      config(displayModeBar = FALSE)
+    
+  })
+  
+  output$lgbtMeetPlot <- renderPlotly({
+    
+    ggplotly(gathered_couples_data %>% 
+               filter(xlgb == "LGB sample") %>% 
+               count(meeting_type) %>% 
+               ggplot(aes(x = reorder(meeting_type, -n), y = n)) + 
+               geom_col() + 
+               labs(x = NULL, y = NULL) +
+               theme_few()) %>% 
+      layout(xaxis = list(tickangle = 20)) %>% 
+      config(displayModeBar = FALSE)
     
   })
   
@@ -502,7 +581,13 @@ server <- function(input, output) {
       
       # Use theme_few for a cleaner, consistent output
       
-      theme_few()
+      theme_few() +
+      
+      # Fix dynamic subsetting
+      
+      geom_vline(
+        xintercept = median(couples_data$age_when_met, na.rm = TRUE), 
+        linetype = "dotted")
     
     # Convert ggplot2 graphic to plotly for a crisper, sharper output
     
@@ -584,7 +669,9 @@ server <- function(input, output) {
     
     # Convert ggplot plot to plotly
     
-    ggplotly(marry)
+    ggplotly(marry) %>% 
+      layout(xaxis = list(tickangle = 20)) %>% 
+      config(displayModeBar = FALSE)
     
   })
 }

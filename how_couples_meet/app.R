@@ -346,7 +346,8 @@ server <- function(input, output) {
       labs(y = NULL, x = "Respondent's Age") + 
       theme_few() + xlim(0, 100) + 
       facet_wrap(~meeting_type) + 
-      theme(legend.position="none")) %>% 
+      theme(legend.position="none",
+            panel.spacing.y=unit(0.75, "lines"))) %>% 
       
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     

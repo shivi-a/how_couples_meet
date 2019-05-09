@@ -69,60 +69,9 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                       plotlyOutput("incomePlotly"),
                     br()
                     ),
-                    DTOutput("educTable"),
                     br()
                     ),
-           
-           # Include a tab to organize visualizations related to information
-           # about partners' ages
-           
-           tabPanel("Age",
-                    
-                    # A particularly relevant question for me is thinking about
-                    # at what age one meets "the one" - a future partner.
-                    # Creating such a histogram allowed for analysis of possible
-                    # trends
-                    
-                    h3("At What Age Did You Meet Your Partner?"),
-                    br(),
-                    sidebarPanel(
-                      
-                      # I hypothesized that the couple identity might affect
-                      # this distribution, and therefore made this an option to
-                      # segment the data being displayed
-                      
-                      radioButtons("identity",
-                                   "Couple Identity:",
-                                   levels(couples_data$w6_same_sex_couple)),
-                      
-                      # We can describe the insights inferred from this plot
-                      
-                      h6("The sample size for LGBTQ couples is much smaller, but the histograms nonetheless suggest that same sex couples tend to meet later in life than heterosexual couples")
-                    ),
-                    mainPanel(
-                      
-                      # Include the plotly output of the age histogram
-                      
-                      plotlyOutput("ageHist"),
-                      br(),
-                      
-                      # After a linebreak for visual purposes, include a related
-                      # visualization - a scatterplot of respondent versus
-                      # partner ages, displaying potential correlations
-                      
-                      h2("Correlations between Partner Ages"),
-                      plotlyOutput("agePlot"),
-                      
-                      # I had female respondent points be colored pink and male
-                      # respondent points be colored blue because I suspected
-                      # that the gender of the respondent might influence this
-                      # correlation, which it did to a fair degree
-                      
-                      h4("Pink points indicate female respondents; blue points indicate male respondents"),
-                      h4("Women tended to report older partners, while men reported younger partners")
-                    )
-           ),
-           
+
            # Create a placeholder tab for visualizations regarding partners'
            # political affliations
            
@@ -134,14 +83,42 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
            # Undecided, but someone weakly identifying with one party or the
            # other
            
+           tabPanel("Ages",
+                    
+                    h3("Who Is Older? Age Differences between Partners"),
+                    h6("Pink points indicate female respondents; blue points indicate male respondents"),
+                    
+                    # After a linebreak for visual purposes, include a related
+                    # visualization - a scatterplot of respondent versus
+                    # partner ages, displaying potential correlations
+                  
+                    plotlyOutput("agePlot"),
+                    
+                    # I had female respondent points be colored pink and male
+                    # respondent points be colored blue because I suspected
+                    # that the gender of the respondent might influence this
+                    # correlation, which it did to a fair degree
+                  
+                    h4("The presence of more pink dots above the dashed line (y = x) and more blue dots below the line suggests that women tended to report their partners were older than them, while men tended to report their partners were younger than them.")
+                    
+           ),
+           
+           tabPanel("Educational Attainment",
+                    h3("Do People Tend to Partner with Those of a Similar Educational Background?"),
+                    br(),
+                    plotlyOutput("educTable")
+                    
+           ),
+           
            tabPanel("Political Affiliation",
-                    h3("Do people tend to partner with those of a similar political affiliation?"),
-                    DTOutput("poliTable")
+                    h3("Do People Tend to Partner with Those of a Similar Political Affiliation?"),
+                    br(),
+                    plotlyOutput("poliTable")
                     
            )
       )
    ),
-tabPanel("Meet",
+tabPanel("How Couples Meet",
          
          # Create a section on the navbar to organize visualization related to
          # how couples meet
@@ -154,8 +131,8 @@ tabPanel("Meet",
              # well as ways to subset the data and see how it affects the most
              # popular meeting types
              
-             tabPanel("Types",
-                      h3("How Do Couples Meet?"),
+             tabPanel("Meeting Type Frequencies",
+                      h3("What Are The Most Common Ways In Which Couples Meet?"),
                       br(),
                       
                       # Include the most common meeting type table for the whole
@@ -171,7 +148,8 @@ tabPanel("Meet",
                       
                       h4("LGBTQ Sample"),
                       plotlyOutput("lgbtMeetPlot"),
-                      DTOutput("lgbTable")
+                      DTOutput("lgbTable"),
+                      br()
              ),
              
              # Devote a separate section to exploring how couples who were
@@ -179,52 +157,12 @@ tabPanel("Meet",
              # have met later in life or not in the classroom. I wanted to know
              # how common this was.
              
-             tabPanel("Classmates",
-                      
-                      # For each line of inquiry, I provided a corresponding
-                      # table of the top five ways in which those couples met
-                      
-                      h3("Did Couples Who Attended the Same High School or College Meet as Classmates?"),
-                      br(),
-                      
-                      # In the future, I plan to tweak this to involve a bar
-                      # plot or stacked bar plot - a more visual approach than a
-                      # table
-                      
-                      h5("Couples who went to the same high school (different colleges)"),
-                      DTOutput("schoolTable"),
-                      
-                      # Line breaks provide aesthetic clarity between the groupings
-                      
-                      br(),
-                      
-                      # I made it a point to separate out those who went to just
-                      # the same college, just the same high school, and the
-                      # same for both in order to prevent overlapping effects
-                      
-                      h5("Couples who went to the same college (different high schools)"),
-                      DTOutput("collegeTable"),
-                      
-                      br(),
-                      h5("Couples who went to the same high school and college"),
-                      DTOutput("classTable")
-                      
-             ),
-             
-             # One of the neatest features of this dataset is that it tracks
-             # connections between individuals who become a couple - e.g. if
-             # they had family in common, friends in common, neighbors in
-             # common, etc. This tab will be devoted to exploring how many
-             # connections are the norm, and how meeting is different or the
-             # same for total strangers
-             
-             tabPanel("Strangers",
-                      h3("Coming soon! - How do couples with no prior connections (friends, family, coworkers, neighbors) meet?")
-             ),
-             
-             tabPanel("Over Time",
-                      h3("Frequency of meeting types as a function of age"),
-                      plotlyOutput("timeMeet")
+             tabPanel("Trends Over Time",
+                      h3("Frequency of Meeting Types as a Function of Respondent's Age"),
+                      plotlyOutput("timeMeet"),
+                      h4("Older respondents are more likely to report meeting their partner in the military or on a blind date than younger respondents."),
+                      h4("Younger respondents are more likely to report meeting their partner through online gaming or social networks online."),
+                      h4("Certain meeting places, such as college and church, have remained consistently frequent among older and younger respondents")
                       ),
              
              # Create a tab with information about when couples meet. One might
@@ -232,7 +170,42 @@ tabPanel("Meet",
              # twelve months, but it appears that some months are more
              # serendipitous than others
              
-             tabPanel("When",
+             # Include a tab to organize visualizations related to information
+             # about partners' ages
+             
+             tabPanel("At What Age?",
+                      
+                      # A particularly relevant question for me is thinking about
+                      # at what age one meets "the one" - a future partner.
+                      # Creating such a histogram allowed for analysis of possible
+                      # trends
+                      
+                      h3("At What Age Did You Meet Your Partner?"),
+                      br(),
+                      sidebarPanel(
+                        
+                        # I hypothesized that the couple identity might affect
+                        # this distribution, and therefore made this an option to
+                        # segment the data being displayed
+                        
+                        radioButtons("identity",
+                                     "Couple Identity:",
+                                     levels(couples_data$w6_same_sex_couple)),
+                        
+                        # We can describe the insights inferred from this plot
+                        
+                        h6("The sample size for LGBTQ couples is much smaller, but the histograms nonetheless suggest that same sex couples tend to meet later in life than heterosexual couples")
+                      ),
+                      mainPanel(
+                        
+                        # Include the plotly output of the age histogram
+                        
+                        plotlyOutput("ageHist"),
+                        br()
+                      )
+             ),
+             
+             tabPanel("At what time of year?",
                       h3("When Do Couples Meet?"),
                       br(),
                       sidebarPanel(
@@ -243,7 +216,7 @@ tabPanel("Meet",
                         
                         radioButtons("region",
                                      "Region:", unique(couples_data$ppreg9)),
-                        h5("There is regional variation in when couples tend to meet")
+                        h5("There is some regional variation as to when couples report first meeting")
                       ),
                       mainPanel(
                         
@@ -257,41 +230,6 @@ tabPanel("Meet",
 # expect this to be evenly and randomly distributed across the
 # twelve months, but it appears that some months are more
 # serendipitous than others
-
-tabPanel("Marry",
-         h3("When Do Couples Marry?"),
-         br(),
-         sidebarPanel(
-           
-           # Allows user to dynamically subset the data to a
-           # specific region, and observe firsthand regional
-           # variation
-           
-           radioButtons("region_marry",
-                        "Region:", unique(couples_data$ppreg9)),
-           h5("There is regional variation in when couples tend to marry")
-           ),
-         mainPanel(
-           
-           # Input the plot itself into the UI
-           
-           plotlyOutput("marryPlot")
-         )),
-
-# In the coming weeks, I hope to make use of the previous iterations of this
-# dataset, which tracked a set of couples over 4-5 years, with many of the same
-# variables. This data can provide interesting insights about how couples stay
-# together, to complement the snapshot in time captured by this data
-
-tabPanel("Stay Together",
-         mainPanel(
-           h2("Stay Together"),
-           h4("What month do couples break up? How long is the average relationship duration before a breakup?")
-         )),
-
-# Include ABOUT tab with important background information and attributions, but
-# purposefully not have it as the initial landing page (start with a more
-# dynamic visualization)
 
 tabPanel("About",
          mainPanel(
@@ -394,7 +332,8 @@ server <- function(input, output) {
     
     # Convert ggplot to plotly for a sharper output
     
-    hide_legend(ggplotly(income)) 
+    hide_legend(ggplotly(income)) %>% config(displayModeBar = FALSE) %>% 
+      style(hoverinfo = "skip")
     
   })
   
@@ -409,7 +348,7 @@ server <- function(input, output) {
       facet_wrap(~meeting_type) + 
       theme(legend.position="none")) %>% 
       
-      config(displayModeBar = FALSE)
+      config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
   })
   
@@ -440,46 +379,10 @@ server <- function(input, output) {
       
       ggplotly(meet) %>% 
         layout(xaxis = list(tickangle = 20)) %>% 
-        config(displayModeBar = FALSE)
+        config(displayModeBar = FALSE) %>% 
+        style(hoverinfo = "skip")
     
    })
-  
-  output$schoolTable <- renderDT({
-    
-    datatable((gathered_couples_data %>% 
-      filter(Q25 == "Same High School", 
-             Q26 == "Did not attend same college or university") %>% 
-      count(meeting_type) %>% 
-      arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"),
-      options = list(dom = 'pt'))
-      
-    #divide by total number to get percentages then table or plot
-  })
-  
-  output$collegeTable <- renderDT({
-    
-    datatable((gathered_couples_data %>% 
-      filter(Q26 == "Attended same college or university", 
-             Q25 == "Different High School") %>% 
-      count(meeting_type) %>% 
-      arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"),
-      options = list(dom = 'pt'))
-    
-  })
-  
-  output$classTable <- renderDT({
-    
-    datatable((gathered_couples_data %>% 
-      filter(Q26 == "Attended same college or university", 
-             Q25 == "Same High School") %>% 
-      count(meeting_type) %>% 
-      arrange(desc(n)) %>% 
-      head(5)), colnames=c("Meeting Type", "Frequency"),
-      options = list(dom = 'pt'))
-    
-  })
   
   output$meetTable <- renderDT ({
     
@@ -500,22 +403,36 @@ server <- function(input, output) {
     
   })
   
-  output$educTable <- renderDT ({
+  output$educTable <- renderPlotly ({
   
-    datatable(couples_data %>% 
+    ggplotly(couples_data %>% 
         filter(!is.na(w6_q10)) %>% 
         group_by(ppeduc, w6_q10) %>%
-        count() %>% spread(key = w6_q10, value = n, fill = 0),
-        options = list(dom = 't'))
+        count() %>% group_by(ppeduc) %>%
+          ggplot(aes(x = ppeduc, y = fct_rev(w6_q10))) + 
+      geom_tile(aes(fill = n), color = "white") + 
+      scale_fill_gradient(low = "white", high = "black") + 
+      labs(y = "Partner's Highest Level of Education", 
+           x = "Respondent's Highest Level of Education", 
+           fill = "Count")) %>% 
+    layout(xaxis = list(side ="top", tickangle = 15)) %>% 
+      config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
+      
   })
   
-  output$poliTable <- renderDT ({
+  output$poliTable <- renderPlotly ({
     
-    datatable(couples_data %>% 
-                filter(!is.na(w6_q12), w6_q12 != "Refused") %>% 
-                group_by(partyid7, w6_q12) %>%
-                count() %>% spread(key = w6_q12, value = n, fill = 0),
-              options = list(dom = 't'))
+    ggplotly(couples %>% 
+               filter(!is.na(w6_q12), w6_q12 != "Refused") %>% 
+               group_by(partyid7, w6_q12) %>%
+               count() %>% ggplot(aes(x = partyid7, y = w6_q12)) + 
+               geom_tile(aes(fill = n), color = "white") + 
+               scale_fill_gradient(low = "white", high = "black") + 
+               labs(y = "Partner's Political Affiliation", 
+                    x = "Respondent's Political Affiliation", 
+                    fill = "Count")) %>% 
+      layout(xaxis = list(side ="top", tickangle = 10)) %>% 
+      config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
   })
   
   output$heteroMeetPlot <- renderPlotly({
@@ -527,7 +444,7 @@ server <- function(input, output) {
                labs(x = NULL, y = NULL) +
                theme_few()) %>% 
       layout(xaxis = list(tickangle = 20)) %>% 
-      config(displayModeBar = FALSE)
+      config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
   })
   
@@ -541,7 +458,7 @@ server <- function(input, output) {
                labs(x = NULL, y = NULL) +
                theme_few()) %>% 
       layout(xaxis = list(tickangle = 20)) %>% 
-      config(displayModeBar = FALSE)
+      config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
   })
   
@@ -575,26 +492,23 @@ server <- function(input, output) {
       labs(y = NULL, x = "Respondent's Age At First Meeting") +
       
       # Add more frequent x-axis labels to better contextualize an axis about
-      # ages
+      # ages +
       
-      scale_x_continuous(breaks = seq(0, 85, by = 10)) +
+      xlim(0, 85) +
       
       # Use theme_few for a cleaner, consistent output
       
-      theme_few() +
-      
-      # Fix dynamic subsetting
-      
-      geom_vline(
-        xintercept = median(couples_data$age_when_met, na.rm = TRUE), 
-        linetype = "dotted")
+      theme_few()
     
     # Convert ggplot2 graphic to plotly for a crisper, sharper output
     
-    ggplotly(gg)
+    ggplotly(gg) %>%
+      
+      config(displayModeBar = FALSE) %>% 
+      
+      style(hoverinfo = "skip")
     
   })
-  
   
   output$agePlot <- renderPlotly({
     
@@ -643,37 +557,14 @@ server <- function(input, output) {
     # Convert ggplot to plotly and hide the legend - uneccessary due to figure
     # caption
     
-    hide_legend(ggplotly(age))
+    hide_legend(ggplotly(age)) %>% 
+      
+      config(displayModeBar = FALSE) %>% 
+      
+      style(hoverinfo = "skip")
   
   })
   
-  output$marryPlot <- renderPlotly({
-    
-    region_subset <- couples_data %>% filter(Q21D_Month != "Refused", ppreg9 == input$region_marry)
-    
-    # draw the histogram with the specified number of bins
-    
-    marry <- ggplot(region_subset, aes(x = Q21D_Month)) + 
-      
-      # Hide the legend for a cleaner plot
-      
-      geom_bar(show.legend=FALSE) + 
-      
-      # Use theme_few for a cleaner plot
-      
-      theme_few() + 
-      
-      # Add labels to contextualize plot - X and Y axis labels are not needed
-      
-      labs(x = NULL, y = NULL)
-    
-    # Convert ggplot plot to plotly
-    
-    ggplotly(marry) %>% 
-      layout(xaxis = list(tickangle = 20)) %>% 
-      config(displayModeBar = FALSE)
-    
-  })
 }
 
 # Run the application 

@@ -22,7 +22,9 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
          # Recode respondent education levels for more sensible factor names,
          # that will be reflected in the Shiny App UI
          
-         ppeduc = fct_recode(ppeduc, "High school graduate" = "HIGH SCHOOL GRADUATE - high school DIPLOMA or the equivalent (GED)"),
+         ppeduc = fct_recode(ppeduc, "High school graduate" = "HIGH SCHOOL GRADUATE - high school DIPLOMA or the equivalent (GED)",
+                             "Bachelor's degree" = "Bachelors degree",
+                             "Master's degree" = "Masters degree"),
          
          # Reorder respondent education factor levels to reflect an ascending
          # order of education completed, which will be reflected in the Shiny
@@ -33,8 +35,7 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
                               "High school graduate", 
                               "Associate degree", 
                               "Bachelor's degree", 
-                              "Master's degree", 
-                              "Professional or Doctorate degree")) %>%
+                              "Master's degree")) %>%
   
   mutate(w6_q10 = fct_lump(w6_q10, 6, 
                            other_level = "Never graduated high school"),
@@ -53,8 +54,7 @@ couples <- read.dta13("HCMST 2017 fresh sample for public sharing draft v1.1.dta
                               "High school graduate", 
                               "Associate degree", 
                               "Bachelor's degree", 
-                              "Master's degree", 
-                              "Professional or Doctorate degree")) %>% 
+                              "Master's degree")) %>% 
   
   # Recode couple identity levels for more sensible factor names,
   # that will be reflected in the Shiny App UI

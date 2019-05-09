@@ -1,4 +1,6 @@
 
+# Load neccessary dependencies
+
 library(shiny)
 library(shinythemes)
 library(tidyverse)
@@ -24,7 +26,7 @@ gathered_couples_data <- read_rds("gathered_couples_file.rds")
 ui <- fluidPage(theme = shinytheme("sandstone"),
   
    # Add line breaks for aesthetic purposes
-   
+  
    br(),
    
    navbarPage("How Couples Meet and Stay Together",
@@ -41,8 +43,11 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
            # overall making less than their partners?
            
            tabPanel("Earnings",
+                    
                     h3("Who Earns More? Earnings between Partners in the U.S."),
+                    
                     br(),
+                    
                     sidebarPanel(
                       
                       # The barplot showing respondent's answers can be faceted
@@ -67,21 +72,18 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                       # sharper looking graphics
                       
                       plotlyOutput("incomePlotly"),
-                    br()
+                    
+                      br()
                     ),
+                    
                     br()
                     ),
 
-           # Create a placeholder tab for visualizations regarding partners'
-           # political affliations
-           
-           # I have created the static versions of these visualizations - they
-           # just need to be cleaned up and made dynamic. They indicate that
-           # those with a strong partisan affiliation tend to partner with those
-           # also with a strong partisan affiliation. Those with no partisan
-           # affiliation tend to not partner with someone also Independent or
-           # Undecided, but someone weakly identifying with one party or the
-           # other
+            # I also was curious about the relationship between the different
+            # ages of two people in a relationship. It is a common intuition
+            # that women are the younger ones in their relationships and men are
+            # the older ones. Making this scatterplot was an attempt to confirm
+            # or deny this intuition
            
            tabPanel("Ages",
                     
@@ -103,16 +105,46 @@ ui <- fluidPage(theme = shinytheme("sandstone"),
                     
            ),
            
+           # Create a tab for visualizations regarding partners'
+           # educational attainment
+           
+           # Thanks to advice from Preceptor, I chose a heatmap to visualize
+           # this data. Those with the highest education levels (e.g. Doctorate)
+           # are very unlikely to partner with someone of a low education level.
+           # Those of lower education attaninment also tend to partner with
+           # those of a similar educational attainment
+           
+           # This graphic was also motivated by the changes observed in
+           # responses to the income question based on respondent education
+           # level. I wanted to see if those responses could potentially be
+           # confounded by changes in partner education level
+           
            tabPanel("Educational Attainment",
+                    
                     h3("Do People Tend to Partner with Those of a Similar Educational Background?"),
+                    
                     br(),
+                    
                     plotlyOutput("educTable")
                     
            ),
            
+           # Create a tab for visualizations regarding partners'
+           # political affliations
+           
+           # Thanks to advice from Preceptor, I chose a heatmap to visualize
+           # this data. It indicates that those with a strong partisan
+           # affiliation tend to partner with those also with a strong partisan
+           # affiliation. Those with no partisan affiliation tend to not partner
+           # with someone also Independent or Undecided, but someone weakly
+           # identifying with one party or the other
+           
            tabPanel("Political Affiliation",
+                    
                     h3("Do People Tend to Partner with Those of a Similar Political Affiliation?"),
+                    
                     br(),
+                    
                     plotlyOutput("poliTable")
                     
            )
@@ -126,10 +158,7 @@ tabPanel("How Couples Meet",
            tabsetPanel(
              
              # Devote the first tab to a general, broad exploration of the
-             # dataset, and most common meeting types overall. Future tweaks
-             # include a slider to control the value for the head() function as
-             # well as ways to subset the data and see how it affects the most
-             # popular meeting types
+             # dataset, and most common meeting types overall. 
              
              tabPanel("Meeting Type Frequencies",
                       h3("What Are The Most Common Ways In Which Couples Meet?"),
@@ -137,38 +166,56 @@ tabPanel("How Couples Meet",
                       
                       # Include the most common meeting type table for the whole
                       # sample
+                      
                       h4("Full Sample"),
+                      
                       plotlyOutput("heteroMeetPlot"),
+                      
                       DTOutput("meetTable"),
                       
                       br(),
                       
                       # Include the most common meeting type table for the whole
-                      # LGBTQ sample
+                      # LGBTQ sample - as a comparison, the ranking of meeting
+                      # types changes, and different meeting types move up in
+                      # "importance" or frequency
                       
                       h4("LGBTQ Sample"),
+                      
                       plotlyOutput("lgbtMeetPlot"),
+                      
                       DTOutput("lgbTable"),
+                      
                       br()
              ),
              
-             # Devote a separate section to exploring how couples who were
-             # classmates met. It is possible for couples who were classmates to
-             # have met later in life or not in the classroom. I wanted to know
-             # how common this was.
+             # Devote a section to understand how trends in couples meeting has
+             # changed over time (using respondent ages as a proxy for time).
+             # The full sample involves respondents from a variety of ages, thus
+             # capturing a representative sample of the nation, but not
+             # necessarily of the kind of meetings that will characterize the
+             # next generation.
+             
+             # By plotting the frequency of each meeting type as a function of
+             # respondent age, we could see that some meeting types are
+             # consistently reported among young and old respondents, likely to
+             # still hold true for future generations, while other meeting types
+             # like the military are only so common among older respondents.
+             # Logically, meeting types like social networks spike among younger
+             # respondents
              
              tabPanel("Trends Over Time",
+                      
                       h3("Frequency of Meeting Types as a Function of Respondent's Age"),
+                      
                       plotlyOutput("timeMeet"),
+                      
                       h4("Older respondents are more likely to report meeting their partner in the military or on a blind date than younger respondents."),
+                      
                       h4("Younger respondents are more likely to report meeting their partner through online gaming or social networks online."),
+                      
                       h4("Certain meeting places, such as college and church, have remained consistently frequent among older and younger respondents")
                       ),
-             
-             # Create a tab with information about when couples meet. One might
-             # expect this to be evenly and randomly distributed across the
-             # twelve months, but it appears that some months are more
-             # serendipitous than others
              
              # Include a tab to organize visualizations related to information
              # about partners' ages
@@ -180,8 +227,24 @@ tabPanel("How Couples Meet",
                       # Creating such a histogram allowed for analysis of possible
                       # trends
                       
+                      # I strongly debated using an overlapping histogram for
+                      # this visual, however ultimately decided against it
+                      # (making sure to nonetheless fix the x-axis scale between
+                      # the plots to allow for comparisons). The reason I
+                      # decided against it was because ultimately, the sample
+                      # size for the heterosexual couples was far larger than
+                      # that of the same-sex couples, meaning that in an
+                      # overlapping histogram, the distribution of counts for
+                      # the same-sex couples was not so clear as a trend.
+                      # Overlapping density curves were also a possibility,
+                      # however, I like prefered the granularity of a histogram
+                      # for this data, where this is a logical bin size of 1
+                      
+                      
                       h3("At What Age Did You Meet Your Partner?"),
+                      
                       br(),
+                      
                       sidebarPanel(
                         
                         # I hypothesized that the couple identity might affect
@@ -205,9 +268,16 @@ tabPanel("How Couples Meet",
                       )
              ),
              
+             # Create a tab with information about when couples meet. One might
+             # expect this to be evenly and randomly distributed across the
+             # twelve months, but it appears that some months are more
+             # serendipitous than others, and that this variation is region-specific
+             
              tabPanel("At what time of year?",
+                      
                       h3("When Do Couples Meet?"),
                       br(),
+                      
                       sidebarPanel(
                         
                         # Allows user to dynamically subset the data to a
@@ -216,8 +286,12 @@ tabPanel("How Couples Meet",
                         
                         radioButtons("region",
                                      "Region:", unique(couples_data$ppreg9)),
+                        
+                        h5("The reported first meetings between couples are not uniformly distributed across all months of the year"),
                         h5("There is some regional variation as to when couples report first meeting")
-                      ),
+                      
+                        ),
+                      
                       mainPanel(
                         
                         # Input the plot itself into the UI
@@ -226,10 +300,8 @@ tabPanel("How Couples Meet",
                       ))
          )),
 
-# Create a section with information about when couples marry. One might
-# expect this to be evenly and randomly distributed across the
-# twelve months, but it appears that some months are more
-# serendipitous than others
+# Include an About” tab with name, contact information, GitHub repo and data
+# source information.
 
 tabPanel("About",
          mainPanel(
@@ -340,14 +412,46 @@ server <- function(input, output) {
   output$timeMeet <- renderPlotly({
     
     ggplotly(gathered_couples_data %>% 
+               
+      # For the sake of having a complete grid of possible meeting types to
+      # display (and not with one facet awkwardly hanging off), I made the
+      # decision to drop one of the Internet-related meeting sub-types, as I
+      # felt that its trend as a function of respondent age was captured by some
+      # of the other Internet-related meeting types
+        
       filter(meeting_type != "Internet Site") %>% 
-      ggplot(aes(x = ppage, fill = meeting_type)) + 
-      geom_density() + 
-      labs(y = NULL, x = "Respondent's Age") + 
-      theme_few() + xlim(0, 100) + 
-      facet_wrap(~meeting_type) + 
-      theme(legend.position="none",
+      
+        ggplot(aes(x = ppage, fill = meeting_type)) + 
+        
+        # Use density curves as they will provide comparable distributions
+        # calculated based on frequency and not total count, thus allowing for
+        # comparison despite differences in the total count per meeting type
+      
+        geom_density() + 
+      
+        labs(y = 'Frequency', x = "Respondent's Age") + 
+      
+        # Use a ggtheme for a more consistent aesthetic, consistent across the app
+        
+        # Fix the x-axis limits to include a logical range of ages
+        
+        theme_few() + xlim(0, 100) + 
+      
+        # Produce a plot for each meeting type
+        
+        facet_wrap(~meeting_type) + 
+      
+        # Attempt to increase the horizontal spacing between rows of facet plots
+        # - some weird formatting / overlap was observed due to ggplotly()
+        # behavior
+        
+        theme(legend.position="none",
             panel.spacing.y=unit(0.75, "lines"))) %>% 
+      
+      # Remove distracting ModeBar and hoverinfo - I find personally that most
+      # of the options plotly provides just lead to unhelpful extreme zooming in
+      # or movement of the data out of visual range -- I hoped to limit such
+      # manipulations
       
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
@@ -379,6 +483,11 @@ server <- function(input, output) {
       # Convert ggplot2 into plotly for sharper, crisper output
       
       ggplotly(meet) %>% 
+        
+        # Ensure that the x-axis labels do not overlap, and remove distracting
+        # ModeBar and hoverinfo that in this context do not provide any useful
+        # information and tend to lead to the plot being messed up
+        
         layout(xaxis = list(tickangle = 20)) %>% 
         config(displayModeBar = FALSE) %>% 
         style(hoverinfo = "skip")
@@ -388,8 +497,17 @@ server <- function(input, output) {
   output$meetTable <- renderDT ({
     
     datatable((gathered_couples_data %>% 
+                 
       count(meeting_type) %>% 
-      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"), 
+        
+      # Arrange the table so as to provide the more meaningful meeting types for
+      # this population first
+        
+      arrange(desc(n))), colnames=c("Meeting Type", "Frequency"),
+      
+      # Remove the search bar option from the table output - a distraction that
+      # provides no benefit in this situation
+      
       options = list(dom = 'pt'))
     
   })
@@ -397,9 +515,19 @@ server <- function(input, output) {
   output$lgbTable <- renderDT ({
     
     datatable((gathered_couples_data %>% 
+                 
       filter(xlgb == "LGB sample") %>% 
+        
       count(meeting_type) %>% 
+      
+        # Arrange the table so as to provide the more meaningful meeting types
+        # for this population first
+        
       arrange(desc(n))), colnames=c("Meeting Type", "Frequency"),
+      
+      # Remove the search bar option from the table output - a distraction that
+      # provides no benefit in this situation
+      
       options = list(dom = 'pt'))
     
   })
@@ -407,16 +535,38 @@ server <- function(input, output) {
   output$educTable <- renderPlotly ({
   
     ggplotly(couples_data %>% 
+               
         filter(!is.na(w6_q10)) %>% 
+          
+        # Create a two-way table for each combination of respondent and partner
+        # education level
+          
         group_by(ppeduc, w6_q10) %>%
-        count() %>% group_by(ppeduc) %>%
+          
+        count() %>% 
+          
           ggplot(aes(x = ppeduc, y = fct_rev(w6_q10))) + 
+          
+      # Use geom_tile to create a heatmap of the counts for each category
+          
       geom_tile(aes(fill = n), color = "white") + 
+      
+      # I considered using another color rather than black to indicate
+      # intensity, but ultimately decided that the connotations of a different
+      # color might distract from the implications of the figure
+        
       scale_fill_gradient(low = "white", high = "black") + 
-      labs(y = "Partner's Highest Level of Education", 
+      
+        labs(y = "Partner's Highest Level of Education", 
            x = "Respondent's Highest Level of Education", 
            fill = "Count")) %>% 
-    layout(xaxis = list(side ="top", tickangle = 15)) %>% 
+    
+      # Ensure that x-axis tick labels do not overlap, and remove the
+      # distracting ModeBar and hover info that do not add in this particular
+      # situation, instead distracting from the plot output
+      
+      layout(xaxis = list(side ="top", tickangle = 15)) %>% 
+      
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
       
   })
@@ -424,15 +574,39 @@ server <- function(input, output) {
   output$poliTable <- renderPlotly ({
     
     ggplotly(couples_data %>% 
+               
                filter(!is.na(w6_q12), w6_q12 != "Refused") %>% 
+               
+               # Create a two-way table for each combination of respondent and partner
+               # political affiliation
+               
                group_by(partyid7, w6_q12) %>%
-               count() %>% ggplot(aes(x = partyid7, y = w6_q12)) + 
+               
+               count() %>% 
+               
+               ggplot(aes(x = partyid7, y = w6_q12)) + 
+               
+               # Use geom_tile to create a heatmap of the counts for each
+               # category
+               
                geom_tile(aes(fill = n), color = "white") + 
+               
+               # I considered using another color rather than black to indicate
+               # intensity, but ultimately decided that the connotations of a different
+               # color might distract from the implications of the figure
+               
                scale_fill_gradient(low = "white", high = "black") + 
+               
                labs(y = "Partner's Political Affiliation", 
                     x = "Respondent's Political Affiliation", 
                     fill = "Count")) %>% 
+      
+      # Ensure that x-axis tick labels do not overlap, and remove the
+      # distracting ModeBar and hover info that do not add in this particular
+      # situation, instead distracting from the plot output
+      
       layout(xaxis = list(side ="top", tickangle = 10)) %>% 
+      
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
   })
   
@@ -440,10 +614,27 @@ server <- function(input, output) {
     
     ggplotly(gathered_couples_data %>% 
                count(meeting_type) %>% 
+               
+               # Generate bar chart of the frequency of each meeting type for
+               # the given population - a more visual representation of what is
+               # displayed in the corresponding table - and ensure that the
+               # factors displayed are in order from most prevalent to least
+               # prevalent so that the most common and least common meeting
+               # types can be compared
+               
                ggplot(aes(x = reorder(meeting_type, -n), y = n)) + 
+               
                geom_col() + 
+               
+               # Remove x and y labels as superfluous in this context
+               
                labs(x = NULL, y = NULL) +
+               
                theme_few()) %>% 
+      
+      # Ensure that x-axis labels do not overlap and that the distracting
+      # ModeBar and hover info are not displayed
+      
       layout(xaxis = list(tickangle = 20)) %>% 
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
@@ -451,14 +642,34 @@ server <- function(input, output) {
   
   output$lgbtMeetPlot <- renderPlotly({
     
-    ggplotly(gathered_couples_data %>% 
+    ggplotly(gathered_couples_data %>%
+               
                filter(xlgb == "LGB sample") %>% 
+               
                count(meeting_type) %>% 
+               
+               # Generate bar chart of the frequency of each meeting type for
+               # the given population - a more visual representation of what is
+               # displayed in the corresponding table - and ensure that the
+               # factors displayed are in order from most prevalent to least
+               # prevalent so that the most common and least common meeting
+               # types can be compared
+               
                ggplot(aes(x = reorder(meeting_type, -n), y = n)) + 
+               
                geom_col() + 
+               
+               # Remove x and y labels as superfluous in this context
+               
                labs(x = NULL, y = NULL) +
+               
                theme_few()) %>% 
+      
+      # Ensure that x-axis labels do not overlap and that the distracting
+      # ModeBar and hover info are not displayed
+      
       layout(xaxis = list(tickangle = 20)) %>% 
+      
       config(displayModeBar = FALSE) %>% style(hoverinfo = "skip")
     
   })
@@ -559,6 +770,9 @@ server <- function(input, output) {
     # caption
     
     hide_legend(ggplotly(age)) %>% 
+      
+      # Ensure that x-axis labels do not overlap and that the distracting
+      # ModeBar and hover info are not displayed
       
       config(displayModeBar = FALSE) %>% 
       

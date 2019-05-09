@@ -422,7 +422,7 @@ server <- function(input, output) {
   
   output$poliTable <- renderPlotly ({
     
-    ggplotly(couples %>% 
+    ggplotly(couples_data %>% 
                filter(!is.na(w6_q12), w6_q12 != "Refused") %>% 
                group_by(partyid7, w6_q12) %>%
                count() %>% ggplot(aes(x = partyid7, y = w6_q12)) + 
